@@ -38,16 +38,18 @@ func NewGrid(rows int, cols int) *Grid {
 }
 
 // AddElement adds an element to the grid
-func (g *Grid) AddElement(elem Element) {
-	for i, r := range g.Elements {
-		for j, c := range r {
-			// Make sure there's an empty spot
-			if c == nil {
-				g.Elements[i][j] = &elem
-				break
-			}
-		}
-	}
+func (g *Grid) AddElement(elem Element, r int, c int) {
+	g.Elements[r][c] = &elem
+
+	// for i, r := range g.Elements {
+	// 	for j, c := range r {
+	// 		// Make sure there's an empty spot
+	// 		if c == nil {
+	// 			g.Elements[i][j] = &elem
+	// 			break
+	// 		}
+	// 	}
+	// }
 }
 
 // Update update func
@@ -58,17 +60,18 @@ func (g *Grid) Draw() {
 	// Don't draw if grid is empty
 	if len(g.Elements) != 0 {
 		// Get each element
-		for _, r := range g.Elements {
-			for j, c := range r {
+		for i, r := range g.Elements {
+			for _, c := range r {
 				if c != nil {
 					cc := *c
 
-					// x := (g.Margin+int(cc.GetWidth()))*i + g.Margin
-					// y := (g.Margin+int(cc.GetHeight()))*j + g.Margin
-					// TODO: fix this
-					x := (j * cc.GetWidth()) + g.Margin
+					w := cc.GetWidth()
+					h := cc.GetHeight()
 
-					cc.SetPos(50, x)
+					x := (g.Margin + int(w)) * i
+					y := (g.Padding + int(h))
+
+					cc.SetPos(x+int(g.Pos.X), y+int(g.Pos.Y))
 
 					cc.Update()
 					cc.Draw()

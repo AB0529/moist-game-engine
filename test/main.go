@@ -24,7 +24,7 @@ func main() {
 	menu.AddElement(logo)
 
 	// Create grid
-	menuGrid := mge.NewGrid(1, 3)
+	menuGrid := mge.NewGrid(3, 4)
 	menuGrid.SetPos(menuGrid.Width+5*menuGrid.Cols/2*menuGrid.Cols, logo.FontSize+20)
 	// Create buttons for the grid
 	// Start btn
@@ -46,19 +46,22 @@ func main() {
 		}
 
 	})
+	startBtn.SetSizeOffText()
 	exitBtn := startBtn.Copy()
-	exitBtn.SetText("Exit")
+	exitBtn.SetText("Eaxidfdt")
 	exitBtn.SetColor(rl.White, rl.Red)
 	exitBtn.SetOnClick(func(b *mge.Button) {
 		menu.StopScene()
 	})
+	startBtn.SetSizeOffText()
 
 	// Add buttons to grid
-	menuGrid.AddElement(startBtn)
-	menuGrid.AddElement(&stopBtn)
-	menuGrid.AddElement(&exitBtn)
-
-	fmt.Println(startBtn.Width, startBtn.Height)
+	menuGrid.AddElement(startBtn, 0, 0)
+	fmt.Println("Start BTN ", startBtn.GetWidth())
+	menuGrid.AddElement(&stopBtn, 1, 0)
+	fmt.Println("Stop BTN ", stopBtn.GetWidth())
+	menuGrid.AddElement(&exitBtn, 2, 0)
+	fmt.Println("Exit BTN ", exitBtn.GetWidth())
 
 	// Create some entities
 	player := mge.NewEntity("assets/cube.png", 1, 1)
@@ -67,6 +70,8 @@ func main() {
 
 	// Add grid to menu scene
 	menu.AddElement(menuGrid)
+
+	fmt.Println(menuGrid.Elements)
 
 	// Start scenes
 	mge.StartScenes()
