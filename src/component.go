@@ -39,15 +39,15 @@ func (c *Component) SetSize(w int, h int) {
 	c.Height = h
 }
 
-// GetWidth gets the width of the element
-func (c *Component) GetWidth() int {
-	return c.Width
-}
+// // GetWidth gets the width of the element
+// func (c *Component) GetWidth() int {
+// 	return c.Width
+// }
 
-// GetHeight gets the height of the element
-func (c *Component) GetHeight() int {
-	return c.Height
-}
+// // GetHeight gets the height of the element
+// func (c *Component) GetHeight() int {
+// 	return c.Height
+// }
 
 // GetPos gets the position of the element
 func (c *Component) GetPos() *rl.Vector2 {

@@ -37,6 +37,16 @@ func NewGrid(rows int, cols int) *Grid {
 	}
 }
 
+// GetWidth gets the width of the grid
+func (g *Grid) GetWidth() int {
+	return g.Width
+}
+
+// GetHeight gets the height of the grid
+func (g *Grid) GetHeight() int {
+	return g.Height
+}
+
 // AddElement adds an element to the grid
 func (g *Grid) AddElement(elem Element, r int, c int) {
 	g.Elements[r][c] = &elem

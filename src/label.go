@@ -9,12 +9,27 @@ type Label struct {
 
 // NewLabel creates a new label component
 func NewLabel(text string) *Label {
-	return &Label{
+	l := &Label{
 		TextComponent: TextComponent{
 			FontSize: DefaultFontSize,
 			Text:     text,
 		},
 	}
+
+	l.Width = int(rl.MeasureText(l.Text, int32(l.FontSize)))
+	l.Height = l.FontSize
+
+	return l
+}
+
+// GetWidth gets the width of the label
+func (l *Label) GetWidth() int {
+	return l.Width
+}
+
+// GetHeight gets the height of the label
+func (l *Label) GetHeight() int {
+	return l.Height
 }
 
 // Copy copies the label

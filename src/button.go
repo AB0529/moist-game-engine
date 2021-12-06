@@ -36,6 +36,16 @@ func NewButton(text string) *Button {
 	}
 }
 
+// GetWidth gets the width of the button
+func (b *Button) GetWidth() int {
+	return b.Width
+}
+
+// GetHeight gets the height of the button
+func (b *Button) GetHeight() int {
+	return b.Height
+}
+
 // Copy copies the button
 func (b *Button) Copy() Button {
 	cpy := *b
@@ -83,7 +93,7 @@ func (b Button) Draw() {
 	rl.DrawRectangle(x, y, w, h, tmp)
 
 	x = int32(b.Pos.X + (float32(b.Component.Width) / 2) - float32(rl.MeasureText(b.Text, int32(b.FontSize))/2))
-	y = int32(b.Component.GetPos().Y) + int32(b.Component.GetHeight())/2 - int32(b.FontSize)/3
+	y = int32(b.Component.GetPos().Y) + int32(b.Component.Height)/2 - int32(b.FontSize)/3
 
 	rl.DrawText(
 		b.Text,

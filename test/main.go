@@ -31,7 +31,7 @@ func main() {
 	startBtn := mge.NewButton("Start")
 	startBtn.Component.SetPos(512, 512)
 	startBtn.SetColor(rl.White, rl.Lime)
-	startBtn.SetFontSize(32)
+	startBtn.SetFontSize(24)
 	startBtn.SetSizeOffText()
 
 	stopBtn := startBtn.Copy()
@@ -48,12 +48,12 @@ func main() {
 	})
 	startBtn.SetSizeOffText()
 	exitBtn := startBtn.Copy()
-	exitBtn.SetText("Eaxidfdt")
+	exitBtn.SetText("Exit")
 	exitBtn.SetColor(rl.White, rl.Red)
 	exitBtn.SetOnClick(func(b *mge.Button) {
 		menu.StopScene()
 	})
-	startBtn.SetSizeOffText()
+	exitBtn.SetSizeOffText()
 
 	// Add buttons to grid
 	menuGrid.AddElement(startBtn, 0, 0)
