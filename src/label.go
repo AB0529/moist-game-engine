@@ -1,33 +1,63 @@
 package mge
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
-// Label a text component
+// Label text label for UI element
 type Label struct {
-	TextComponent
+	Component
+	Text string
 }
 
 // NewLabel creates a new label component
-func NewLabel(text string) *Label {
+func NewLabel(s string) *Label {
 	return &Label{
-		TextComponent: TextComponent{
-			FontSize: DefaultFontSize,
-			Text:     text,
-		},
+		Text: s,
 	}
 }
 
+func (l *Label) Update() {}
+
 // Copy copies the label
 func (l *Label) Copy() Label {
-	cpy := *l
+	cpy := l
 
-	return cpy
+	return *cpy
 }
 
-// Update balnk update for now
-func (l *Label) Update() {}
+// GetPos returns the position vector
+func (l *Label) GetPos() rl.Vector2 {
+	return l.Pos
+}
+
+// GetWidth returns the width of the label
+func (l *Label) GetWidth() int32 {
+	return rl.MeasureText(l.Text, l.FontSize)
+}
+
+// GetHeight returns the height of the label
+func (l *Label) GetHeight() int32 {
+	return l.FontSize
+}
+
+// SetText sets the text of the label
+func (l *Label) SetText(s string) {
+	l.Text = s
+}
+
+// SetSize sets the width and height of the label
+func (l *Label) SetSize(w int32, h int32) {
+	l.Width = w
+	l.Height = h
+}
+
+// SetFontSize sets the size of the font
+func (l *Label) SetFontSize(fs int32) {
+	l.FontSize = fs
+}
 
 // Draw drwas the label on the screen
 func (l *Label) Draw() {
-	rl.DrawText(l.Text, int32(l.Component.GetPos().X), int32(l.Component.GetPos().Y), int32(l.FontSize), *l.GetFG())
+	rl.DrawText(l.Text, int32(l.Pos.X), int32(l.Pos.Y), l.FontSize, l.FG)
 }

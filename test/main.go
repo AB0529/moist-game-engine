@@ -2,7 +2,6 @@ package main
 
 import (
 	mge "AB0529/mge/src"
-	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -17,23 +16,20 @@ func main() {
 	logo.SetColor(rl.Purple, rl.Blank)
 	logo.SetFontSize(32)
 	logo.SetPos(
-		mge.Engine.Window.Width/2-int(rl.MeasureText(logo.Text, int32(logo.FontSize))/2),
+		mge.Engine.Window.Width/2-int(rl.MeasureText(logo.Text, logo.FontSize)/2),
 		int(logo.FontSize)/2,
 	)
 	// Add elements to the scene
 	menu.AddElement(logo)
 
 	// Create grid
-	menuGrid := mge.NewGrid(1, 3)
-	menuGrid.SetPos(menuGrid.Width+5*menuGrid.Cols/2*menuGrid.Cols, logo.FontSize+20)
+	menuGrid := mge.NewGrid(3, 4, 128, 32, 5)
+	menuGrid.SetPos((int(menuGrid.Width+5*int32(menuGrid.Cols))/2)*menuGrid.Cols, int(logo.FontSize)+20)
 	// Create buttons for the grid
 	// Start btn
-	startBtn := mge.NewButton("Start")
-	startBtn.Component.SetPos(512, 512)
+	startBtn := mge.NewButton("Start", func(b *mge.Button) {})
 	startBtn.SetColor(rl.White, rl.Lime)
 	startBtn.SetFontSize(32)
-	startBtn.SetSizeOffText()
-
 	stopBtn := startBtn.Copy()
 	stopBtn.SetText("New")
 	stopBtn.SetColor(rl.White, rl.Orange)
@@ -54,20 +50,12 @@ func main() {
 	})
 
 	// Add buttons to grid
-	menuGrid.AddElement(startBtn)
-	menuGrid.AddElement(&stopBtn)
-	menuGrid.AddElement(&exitBtn)
-
-	fmt.Println(startBtn.Width, startBtn.Height)
-
-	// Create some entities
-	player := mge.NewEntity("assets/cube.png", 1, 1)
-	player.SetPos(mge.CenterX(), mge.CenterY())
-	menu.AddEntity(player)
+	menuGrid.AddElement(startBtn, 0, 0)
+	menuGrid.AddElement(&stopBtn, 0, 1)
+	menuGrid.AddElement(&exitBtn, 0, 2)
 
 	// Add grid to menu scene
-	menu.AddElement(menuGrid)
-
+	menu.AddGrid(menuGrid)
 	// Start scenes
 	mge.StartScenes()
 
@@ -75,19 +63,10 @@ func main() {
 }
 
 func MenuDraw(s *mge.Scene) {
-	player := s.Entities[0]
-
-	player.Draw()
-
 	s.SetColorBackground(rl.DarkPurple)
 }
 
 func MenuUpdate(s *mge.Scene) {
-	player := s.Entities[0]
-
-	player.FollowUserInput(20)
-	player.MoveBackOnScreen(1)
-
 	if rl.IsKeyPressed(rl.KeyEscape) {
 		s.StopScene()
 	}
