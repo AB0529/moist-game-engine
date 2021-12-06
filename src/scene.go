@@ -12,8 +12,8 @@ type Scene struct {
 	// Entites all entities in the scene
 	Entities []*Entity
 	// Components all UI componenets in the scene
-	Components     []Element
-	GridComponents []*GridComponent
+	Components []Element
+	// GridComponents []*GridComponent
 	// EndScene true will end scene, false will continue the scene
 	EndScene bool
 	// DrawFunc the draw function
@@ -61,24 +61,6 @@ func StartScenes() {
 					c.Draw()
 				}
 			}
-			// Draw the grid
-			if len(s.GridComponents) != 0 {
-				for _, g := range s.GridComponents {
-					for j, row := range g.Grid {
-						for i, col := range row {
-							// Draw each row
-							if col != nil {
-								x := (g.Margin+int(col.GetWidth()))*i + g.Margin
-								y := (g.Margin+int(col.GetHeight()))*j + g.Margin
-								col.SetPos(x+int(g.Pos.X), y+int(g.Pos.Y))
-								col.SetSize(g.Width, g.Height)
-								col.Draw()
-								col.Update()
-							}
-						}
-					}
-				}
-			}
 
 			s.DrawFunc(s)
 			rl.EndDrawing()
@@ -97,16 +79,16 @@ func (s *Scene) StopScene() {
 		e.Delete()
 	}
 	// Remove everything in grid
-	for _, g := range s.GridComponents {
-		for _, row := range g.Grid {
-			for _, col := range row {
-				// Delete each row
-				if col != nil {
-					col.Delete()
-				}
-			}
-		}
-	}
+	// for _, g := range s.GridComponents {
+	// 	for _, row := range g.Grid {
+	// 		for _, col := range row {
+	// 			// Delete each row
+	// 			if col != nil {
+	// 				col.Delete()
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 // AddEntity will add a entity to the scene
@@ -117,11 +99,6 @@ func (s *Scene) AddEntity(e *Entity) {
 // AddElement will add an element to the scene
 func (s *Scene) AddElement(e Element) {
 	s.Components = append(s.Components, e)
-}
-
-// AddGrid adds the grid to the scene
-func (s *Scene) AddGrid(g *GridComponent) {
-	s.GridComponents = append(s.GridComponents, g)
 }
 
 // SetColorBackground sets the scene background to a color

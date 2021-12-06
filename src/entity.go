@@ -80,6 +80,11 @@ func (e *Entity) Update() {
 	}
 }
 
+// SetPos sets the entities position
+func (e *Entity) SetPos(x int, y int) {
+	e.Pos = rl.Vector2{X: float32(x), Y: float32(y)}
+}
+
 // IsOffScreenLeft checks if the entity of on or off left side of screen
 func (e *Entity) IsOffScreenLeft() bool {
 	return e.Pos.X+float32(e.Animaton.GetWidth()) < 0
