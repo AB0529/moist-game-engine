@@ -55,20 +55,24 @@ func (g *Grid) Update() {}
 
 // Draw draws the grid and the elements in it
 func (g *Grid) Draw() {
-	// Get each element
-	for _, r := range g.Elements {
-		for j, c := range r {
-			if c != nil {
-				cc := *c
+	// Don't draw if grid is empty
+	if len(g.Elements) != 0 {
+		// Get each element
+		for _, r := range g.Elements {
+			for j, c := range r {
+				if c != nil {
+					cc := *c
 
-				// x := ((g.Margin+int(cc.GetWidth()))*i + g.Margin) + int(g.Pos.X)
-				// y := ((g.Padding+int(cc.GetHeight()))*j + g.Padding) + int(g.Pos.Y)
-				x := (cc.GetWidth() * j) + g.Margin
+					// x := (g.Margin+int(cc.GetWidth()))*i + g.Margin
+					// y := (g.Margin+int(cc.GetHeight()))*j + g.Margin
+					// TODO: fix this
+					x := (j * cc.GetWidth()) + g.Margin
 
-				cc.SetPos(50, x)
+					cc.SetPos(50, x)
 
-				cc.Update()
-				cc.Draw()
+					cc.Update()
+					cc.Draw()
+				}
 			}
 		}
 	}

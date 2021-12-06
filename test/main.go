@@ -31,7 +31,7 @@ func main() {
 	startBtn := mge.NewButton("Start")
 	startBtn.Component.SetPos(512, 512)
 	startBtn.SetColor(rl.White, rl.Lime)
-	startBtn.SetFontSize(50)
+	startBtn.SetFontSize(32)
 	startBtn.SetSizeOffText()
 
 	stopBtn := startBtn.Copy()
