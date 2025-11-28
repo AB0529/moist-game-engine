@@ -1,0 +1,21 @@
+[
+  {
+    "arguments": [
+      "/usr/sbin/gcc",
+      "-Wall",
+      "-Wextra",
+      "-std=c23",
+      "-O2",
+      "-Iinclude",
+      "-Isrc",
+      "-Iexternal/raylib/src",
+      "-c",
+      "-o",
+      "build/obj/main.o",
+      "src/main.c"
+    ],
+    "directory": "/home/ab/Coding/C/raylib-test",
+    "file": "/home/ab/Coding/C/raylib-test/src/main.c",
+    "output": "/home/ab/Coding/C/raylib-test/build/obj/main.o"
+  }
+]

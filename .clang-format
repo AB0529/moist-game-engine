@@ -1,0 +1,41 @@
+# .clang-format
+BasedOnStyle: LLVM
+
+# Tabs instead of spaces
+IndentWidth: 4
+TabWidth: 4
+UseTab: ForIndentation
+
+# Line length
+ColumnLimit: 100
+
+# Brace and layout style
+BreakBeforeBraces: Attach
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+
+# Spaces
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpacesInAngles: false
+
+# Pointer & reference alignment
+PointerAlignment: Left
+ReferenceAlignment: Left
+DerivePointerAlignment: false
+
+# Includes
+IncludeBlocks: Regroup
+SortIncludes: true
+
+# Switch-case
+IndentCaseLabels: true
+
+# Namespace formatting
+NamespaceIndentation: None
+
+# C++ specific options (if any C++ exists)
+AllowAllArgumentsOnNextLine: true
+BreakConstructorInitializers: AfterColon
+
