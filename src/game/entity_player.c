@@ -7,6 +7,7 @@
 #include "engine/systems/assets_man.h"
 #include "engine/systems/input_man.h"
 #include "game/game_context.h"
+#include "engine/systems/ui_inventory.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -97,21 +98,20 @@ void player_draw(Player* p) {
 	animation_draw(p->current, draw_pos);
 }
 
-void player_open_inventory(GameCtx* gctx, Player* player) {
-	if (!player)
+void player_open_inventory(EngineCtx* ectx, GameCtx* gctx, Player* player) {
+	if (!ectx || !gctx || !player)
 		return;
 
-	// Assign inventory
-	gctx->ui_inventory.inventory = player->entity->inventory;
+	// Create a UIInventory state and open it as a panel
+	UIInventory* ustate = ui_inventory_create_state(player->entity->inventory);
+	if (!ustate)
+		return;
 
-	// Fallback size if invalid
-	if (gctx->ui_inventory.size.x <= 0 || gctx->ui_inventory.size.y <= 0) {
-		gctx->ui_inventory.size = (Vector2){5, 5};
-	}
+	// Assign asset pointer from asset manager
+	ustate->asset = asset_get(&ectx->assets, "ui_sprite");
 
-	// Reset selection
-	gctx->ui_inventory.selected = (Vector2){0, 0};
+	// Apply current UI color selection from engine/ui manager (gray/blue/orange)
+	ustate->ui_type = ectx->ui.type;
 
-	// Enable inventory UI
-	gctx->ui_state = UI_INVENTORY;
+	ui_manager_open_panel(ectx, ui_inventory_get_panel_template(), ustate);
 }

@@ -4,7 +4,6 @@
 #include "engine/core/engine.h"
 #include "engine/core/item.h"
 #include "engine/systems/assets_animation_man.h"
-#include "engine/systems/ui_man.h"
 #include "game/entity_item.h"
 #include "game/entity_player.h"
 #include "game/inventory_man.h"
@@ -73,13 +72,6 @@ void game_init(EngineCtx* ctx, GameCtx* gctx) {
 	gctx->dropped_count = 0;
 	gctx->dropped_items = malloc(sizeof(EntityItem*) * gctx->dropped_capacity);
 
-	// --- Initialize UI inventory ---
-	gctx->ui_inventory.asset = asset_get(&ctx->assets, "ui_sprite");
-	gctx->ui_inventory.inventory = NULL;
-	gctx->ui_inventory.size = (Vector2){5, 5};
-	gctx->ui_inventory.selected = (Vector2){0, 0};
-	gctx->ui_inventory.settings = init_ui_inventory_settings();
-
 	EntityItem* ingot_entity = entity_item_init(&ctx->assets, i2, (Vector2){500, 500}, 1);
 
 	game_spawn_item(gctx, ingot_entity);
@@ -100,18 +92,6 @@ void game_draw(EngineCtx* ctx, GameCtx* gctx) {
 	    gctx->player->camera.target.x - gctx->player->camera.offset.x + GetScreenWidth() / 2.0f,
 	    gctx->player->camera.target.y - gctx->player->camera.offset.y + GetScreenHeight() / 2.0f};
 
-	switch (gctx->ui_state) {
-		case UI_VENDOR:
-		case UI_INVENTORY:
-			draw_ui_inventory(ctx, &gctx->ui_inventory,
-			                  (Vector2){GetScreenWidth() / 2, GetScreenHeight() / 2});
-			break;
-
-		default:
-		case UI_NONE:
-			break;
-	}
-
 	for (int i = 0; i < gctx->dropped_count; i++) {
 		EntityItem* e = gctx->dropped_items[i];
 		if (e && !e->is_dead)
@@ -120,29 +100,27 @@ void game_draw(EngineCtx* ctx, GameCtx* gctx) {
 }
 
 void game_update(EngineCtx* ctx, GameCtx* gctx) {
-	input_update(&ctx->input);
 
-	if (ctx->input.down[InputManager_Key_Inventory_Open]) {
-		player_open_inventory(gctx, gctx->player);
+	if (ctx->input.pressed[InputManager_Key_Inventory_Open]) {
+		if (ctx->ui.state == UIState_None) {
+			player_open_inventory(ctx, gctx, gctx->player);
+		} else {
+			ui_manager_close(ctx);
+		}
 	}
 
-	if (gctx->ui_state != UI_NONE && ctx->input.down[InputManager_Key_UI_Close]) {
-		gctx->ui_state = UI_NONE;
-		return;
-	}
-
-	if (gctx->ui_state != UI_NONE) {
-		update_ui_inventory(ctx, &gctx->ui_inventory);
-		return;
-	} else {
+	// If a UI is open, prevent the player from moving to avoid unintended input
+	// interactions. UI navigation still happens in ui_manager_update() which runs
+	// after game_update in the main loop.
+	if (ctx->ui.state == UIState_None) {
 		player_update(gctx->player, &ctx->input);
 	}
 
 	// Update all items
 	for (int i = 0; i < gctx->dropped_count; i++) {
 		EntityItem* e = gctx->dropped_items[i];
-
 		if (!e || e->is_dead)
+
 			continue;
 
 		entity_item_update(&ctx->assets, e, gctx);

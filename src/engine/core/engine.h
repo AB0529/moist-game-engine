@@ -89,8 +89,6 @@ typedef enum {
 	ITEM_TYPE_COUNT
 } ItemType;
 
-typedef enum { UI_NONE = 0, UI_INVENTORY, UI_VENDOR, UI_PAUSE, UI_TYPE_COUNT } UIType;
-
 typedef struct Asset {
 	char* path;
 	char* name;
@@ -150,6 +148,8 @@ typedef struct UIInventorySettings {
 	float base_x; // screen position of UI
 	float base_y; // screen position of UI
 } UIInventorySettings;
+// UI color variants available in the UI spritesheet
+typedef enum UIType { UIType_Gray = 1, UIType_Blue, UIType_Orange } UIType;
 
 typedef struct UIInventory {
 	Asset* asset;
@@ -157,4 +157,20 @@ typedef struct UIInventory {
 	Vector2 size;
 	Vector2 selected;
 	UIInventorySettings settings;
+	UIType ui_type; // color variant for this UI (uses UIType enum)
 } UIInventory;
+
+typedef enum UISlotType { UISlotType_Default = 1, UISlotType_Pushed, UISlotType_Trans } UISlotType;
+
+typedef struct UIBase {
+	UIType type;
+	float scale;
+	Rectangle spritesheet_location;
+} UIBase;
+
+typedef struct UISlot {
+	UIType type;
+	UISlotType slot_type;
+	float scale;
+	Rectangle spritesheet_location;
+} UISlot;

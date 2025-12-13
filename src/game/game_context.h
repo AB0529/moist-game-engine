@@ -25,8 +25,6 @@ typedef struct EntityItem {
 
 typedef struct GameCtx {
 	bool is_paused;
-	UIInventory ui_inventory;
-	UIType ui_state;
 	Player* player;
 
 	EntityItem** dropped_items;

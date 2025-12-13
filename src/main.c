@@ -1,6 +1,7 @@
 #include "engine/core/engine.h"
 #include "engine/core/item.h"
 #include "engine/systems/assets_man.h"
+#include "engine/systems/ui_man.h"
 #include "game/entity_item.h"
 #include "game/game.h"
 #include "game/game_context.h"
@@ -19,7 +20,8 @@ int main() {
 	while (!WindowShouldClose()) {
 		input_update(&ectx.input);
 
-		game_update(&ectx, &gctx);
+	game_update(&ectx, &gctx);
+	ui_manager_update(&ectx, &ectx.ui);
 
 		BeginDrawing();
 		BeginMode2D(gctx.player->camera);
@@ -27,6 +29,9 @@ int main() {
 		game_draw(&ectx, &gctx);
 
 		EndMode2D();
+
+	// UI Drawings
+	ui_manager_draw(&ectx, &ectx.ui);
 
 		// Debug texts (screen-space)
 		DrawText(TextFormat("FPS: %d", GetFPS()), 10, 10, 20, BLACK);

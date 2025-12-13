@@ -1,148 +1,80 @@
-#include "ui_man.h"
+#include "engine/systems/ui_man.h"
 
 #include "engine/core/engine.h"
 #include "engine/core/engine_context.h"
-#include "engine/core/item.h"
-#include "engine/systems/assets_animation_man.h"
+#include "engine/systems/assets_man.h"
+#include "engine/systems/ui_inventory.h"
 
-#include <raylib.h>
+#include <stdlib.h>
 
-UIInventorySettings init_ui_inventory_settings() {
-	UIInventorySettings s = {0};
+UIManager* ui_manager_init(UIManager* ui_man) {
+	ui_man->state = UIState_None;
+	ui_man->type = UIType_Gray;
 
-	s.src_base = (Rectangle){32, 32, 96, 64};
-	s.src_slot = (Rectangle){32, 128, 32, 32};
+	ui_man->active_panel = NULL;
+	ui_man->active_panel_state = NULL;
 
-	s.scale = 0.5f;
-
-	s.pad = 25 * s.scale;
-	s.spacing_x = 5 * s.scale;
-	s.spacing_y = 5 * s.scale;
-
-	s.slot_w = s.src_slot.width * 4 * s.scale;
-	s.slot_h = s.src_slot.height * 4 * s.scale;
-
-	s.base_x = 100 * s.scale;
-	s.base_y = 100 * s.scale;
-
-	return s;
+	return ui_man;
 }
 
-void draw_ui_inventory(EngineCtx* ctx, UIInventory* u, Vector2 pos) {
-	if (!u || !u->inventory)
-		return;
+void ui_manager_destroy(UIManager* ui_man) {
+	(void)ui_man;
+}
 
-	UIInventorySettings s = u->settings;
-	Inventory* inv = u->inventory;
+void ui_manager_draw(EngineCtx* ctx, UIManager* ui_man) {
+	switch (ui_man->state) {
+		case UIState_Inventory: {
+			// If active panel requests overlay, draw it
+			if (ui_man->active_panel && ui_man->active_panel->draw_overlay) {
+				DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.7f));
+			}
 
-	int rows = (int)u->size.y;
-	int cols = (int)u->size.x;
+			// If we have an active panel, call its draw callback
+			if (ui_man->active_panel && ui_man->active_panel->draw) {
+				ui_man->active_panel->draw(ctx, ui_man->active_panel_state);
+			}
+			break;
+		}
 
-	// --- TEXTURE ---
-	Texture2D uiTex = u->asset->texture;
+		default:
+		case UIState_None: {
 
-	// --- COMPUTE BASE SIZE ---
-	float base_w = s.pad * 2 + cols * s.slot_w + (cols - 1) * s.spacing_x;
-	float base_h = s.pad * 2 + rows * s.slot_h + (rows - 1) * s.spacing_y;
-
-	pos = (Vector2){pos.x - base_w / 2, pos.y - base_h / 2};
-
-	// --- DRAW BASE PANEL ---
-	DrawTexturePro(uiTex, s.src_base,
-	               (Rectangle){pos.x, pos.y, base_w, base_h}, // position now uses pos
-	               (Vector2){0, 0},                           // origin top-left
-	               u->asset->rotation, WHITE);
-
-	// --- GRID ORIGIN (relative to pos) ---
-	float grid_x = pos.x + s.pad;
-	float grid_y = pos.y + s.pad;
-
-	// --- DRAW SLOTS + ITEMS ---
-	for (int r = 0; r < rows; r++) {
-		for (int c = 0; c < cols; c++) {
-			float px = grid_x + c * (s.slot_w + s.spacing_x);
-			float py = grid_y + r * (s.slot_h + s.spacing_y);
-
-			// Draw slot frame
-			DrawTexturePro(uiTex, s.src_slot, (Rectangle){px, py, s.slot_w, s.slot_h},
-			               (Vector2){0, 0}, 0, WHITE);
-
-			// Draw item if present
-			int index = r * cols + c;
-			if (index >= inv->count)
-				continue;
-
-			Item* item = inv->items[index];
-			if (!item)
-				continue;
-
-			Asset* item_asset = item->asset;
-			Rectangle src_icon = item_get_sprite_from_type(item->type);
-
-			float icon_w = src_icon.width * 5 * s.scale;
-			float icon_h = src_icon.height * 5 * s.scale;
-
-			DrawTexturePro(item_asset->texture, src_icon,
-			               (Rectangle){px + (s.slot_w - icon_w) / 2, py + (s.slot_h - icon_h) / 2,
-			                           icon_w, icon_h},
-			               (Vector2){0, 0}, 0, WHITE);
+			break;
 		}
 	}
-
-	// --- DRAW SELECTION HIGHLIGHT ---
-	Vector2 selected = u->selected;
-
-	AssetAnimation* sel_anim = asset_animation_get(&ctx->assets, "ui_sprite_anim");
-	animation_update(sel_anim);
-
-	// Scale highlight to slot size
-	sel_anim->asset->scale =
-	    (Vector2){s.slot_w / sel_anim->frame_size.x, s.slot_h / sel_anim->frame_size.y};
-
-	float sel_x = grid_x + selected.x * (s.slot_w + s.spacing_x);
-	float sel_y = grid_y + selected.y * (s.slot_h + s.spacing_y);
-
-	animation_draw(sel_anim, (Vector2){sel_x, sel_y});
 }
 
-// TODO: move this into UIInventory settings
-#define MOVE_DELAY 0.2f
-static float move_timer_x = 0;
-static float move_timer_y = 0;
-
-void update_ui_inventory(EngineCtx* ctx, UIInventory* u) {
-	Vector2* selected = &u->selected;
-	float dt = GetFrameTime();
-
-	// Horizontal
-	if (ctx->input.pressed[InputManager_Key_UI_MoveLeft] ||
-	    (ctx->input.down[InputManager_Key_UI_MoveLeft] && move_timer_x <= 0)) {
-		if (selected->x > 0)
-			selected->x--;
-		move_timer_x = MOVE_DELAY;
+void ui_manager_update(EngineCtx* ctx, UIManager* ui_man) {
+	// Forward update to active panel if present
+	if (ui_man->active_panel && ui_man->active_panel->update) {
+		ui_man->active_panel->update(ctx, ui_man->active_panel_state);
 	}
-	if (ctx->input.pressed[InputManager_Key_UI_MoveRight] ||
-	    (ctx->input.down[InputManager_Key_UI_MoveRight] && move_timer_x <= 0)) {
-		if (selected->x < u->size.x - 1)
-			selected->x++;
-		move_timer_x = MOVE_DELAY;
+}
+
+void ui_manager_open_panel(EngineCtx* ctx, UIPanel* panel, void* state) {
+	if (!ctx)
+		return;
+
+	// Close existing panel first
+	if (ctx->ui.active_panel) {
+		if (ctx->ui.active_panel->on_close && ctx->ui.active_panel_state)
+			ctx->ui.active_panel->on_close(ctx->ui.active_panel_state);
 	}
 
-	// Vertical
-	if (ctx->input.pressed[InputManager_Key_UI_MoveUp] ||
-	    (ctx->input.down[InputManager_Key_UI_MoveUp] && move_timer_y <= 0)) {
-		if (selected->y > 0)
-			selected->y--;
-		move_timer_y = MOVE_DELAY;
-	}
-	if (ctx->input.pressed[InputManager_Key_UI_MoveDown] ||
-	    (ctx->input.down[InputManager_Key_UI_MoveDown] && move_timer_y <= 0)) {
-		if (selected->y < u->size.y - 1)
-			selected->y++;
-		move_timer_y = MOVE_DELAY;
+	ctx->ui.active_panel = panel;
+	ctx->ui.active_panel_state = state;
+	ctx->ui.state = UIState_Inventory; // treat generic panel as modal inventory-like state
+}
+
+void ui_manager_close(EngineCtx* ctx) {
+	if (!ctx)
+		return;
+
+	if (ctx->ui.active_panel && ctx->ui.active_panel->on_close && ctx->ui.active_panel_state) {
+		ctx->ui.active_panel->on_close(ctx->ui.active_panel_state);
 	}
 
-	// Decrease timers
-	move_timer_x -= dt;
-	move_timer_y -= dt;
+	ctx->ui.active_panel = NULL;
+	ctx->ui.active_panel_state = NULL;
+	ctx->ui.state = UIState_None;
 }
